@@ -5,7 +5,7 @@ ABRAHAM KUIR - SCT=0727/2020
 #include <stdio.h>
 #include <stdlib.h>
 
-// Structure for a node in the binary search tree
+// Structure for a node in BST
 struct Node {
     int data;
     struct Node* left;
@@ -13,54 +13,36 @@ struct Node {
 };
 
 // Function to create a new node
-struct Node* createNode(int value) {
+struct Node* newNode(int data) {
     struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
-    newNode->data = value;
+    newNode->data = data;
     newNode->left = newNode->right = NULL;
     return newNode;
 }
 
 // Function to insert a node into BST
-struct Node* insert(struct Node* root, int value) {
-    if (root == NULL) {
-        return createNode(value);
-    }
-    if (value < root->data) {
-        root->left = insert(root->left, value);
-    } else if (value > root->data) {
-        root->right = insert(root->right, value);
-    }
-    return root;
-}
+struct Node* insert(struct Node* root, int data) {
+    if (root == NULL)
+        return newNode(data);
 
-// Function to create BST from array
-struct Node* createBSTFromArray(int arr[], int n) {
-    struct Node* root = NULL;
-    for (int i = 0; i < n; i++) {
-        root = insert(root, arr[i]);
-    }
-    return root;
-}
+    if (data < root->data)
+        root->left = insert(root->left, data);
+    else if (data > root->data)
+        root->right = insert(root->right, data);
 
-// Function to find the minimum value node in a BST
-struct Node* minValueNode(struct Node* node) {
-    struct Node* current = node;
-    while (current && current->left != NULL) {
-        current = current->left;
-    }
-    return current;
+    return root;
 }
 
 // Function to delete a node from BST
 struct Node* deleteNode(struct Node* root, int key) {
-    if (root == NULL) {
+    if (root == NULL)
         return root;
-    }
-    if (key < root->data) {
+
+    if (key < root->data)
         root->left = deleteNode(root->left, key);
-    } else if (key > root->data) {
+    else if (key > root->data)
         root->right = deleteNode(root->right, key);
-    } else {
+    else {
         if (root->left == NULL) {
             struct Node* temp = root->right;
             free(root);
@@ -70,70 +52,83 @@ struct Node* deleteNode(struct Node* root, int key) {
             free(root);
             return temp;
         }
-        struct Node* temp = minValueNode(root->right);
+
+        struct Node* temp = root->right;
+        while (temp && temp->left != NULL)
+            temp = temp->left;
+
         root->data = temp->data;
         root->right = deleteNode(root->right, temp->data);
     }
     return root;
 }
 
-// Function to get the height of the BST
+// Function to find the height of BST
 int height(struct Node* root) {
-    if (root == NULL) {
+    if (root == NULL)
         return -1;
-    }
+
     int leftHeight = height(root->left);
     int rightHeight = height(root->right);
-    return (leftHeight > rightHeight ? leftHeight : rightHeight) + 1;
+
+    return (leftHeight > rightHeight) ? leftHeight + 1 : rightHeight + 1;
 }
 
 // Function to print the level and height of a node
-void printLevelAndHeight(struct Node* root, int value, int level) {
+void printLevelAndHeight(struct Node* root, int key, int level) {
     if (root == NULL) {
-        printf("Node not found\n");
+        printf("Node with value %d not found in the tree.\n", key);
         return;
     }
-    if (value == root->data) {
-        printf("Level: %d\n", level);
-        printf("Height: %d\n", height(root));
-    } else if (value < root->data) {
-        printLevelAndHeight(root->left, value, level + 1);
-    } else {
-        printLevelAndHeight(root->right, value, level + 1);
+
+    if (root->data == key) {
+        printf("Level of node %d: %d\n", key, level);
+        printf("Height of node %d: %d\n", key, height(root));
+        return;
     }
+
+    if (key < root->data)
+        printLevelAndHeight(root->left, key, level + 1);
+    else
+        printLevelAndHeight(root->right, key, level + 1);
 }
 
-// Function to deallocate memory of BST
-void freeBST(struct Node* root) {
-    if (root == NULL) {
-        return;
+// Function to print the BST in inorder traversal
+void inorder(struct Node* root) {
+    if (root != NULL) {
+        inorder(root->left);
+        printf("%d ", root->data);
+        inorder(root->right);
     }
-    freeBST(root->left);
-    freeBST(root->right);
-    free(root);
 }
 
 int main() {
+    // Given array representing the BST
     int arr[] = {30, 20, 40, 10, 25, 35, 45, 5, 15};
     int n = sizeof(arr) / sizeof(arr[0]);
 
-    struct Node* root = createBSTFromArray(arr, n);
+    struct Node* root = NULL;
 
-    // Test deleting a node
-    int keyToDelete = 20;
-    printf("Deleting node with value %d\n", keyToDelete);
-    root = deleteNode(root, keyToDelete);
+    // Creating the BST from the array
+    for (int i = 0; i < n; i++)
+        root = insert(root, arr[i]);
 
-    // Print the height of the BST
+    // Printing the BST in inorder traversal
+    printf("Inorder traversal of the BST: ");
+    inorder(root);
+    printf("\n");
+
+    // Deleting a node from the BST (Example: Deleting node 20)
+    root = deleteNode(root, 20);
+    printf("Inorder traversal after deleting node 20: ");
+    inorder(root);
+    printf("\n");
+
+    // Printing the height of the BST
     printf("Height of the BST: %d\n", height(root));
 
-    // Test printing level and height of a node
-    int valueToFind = 30;
-    printf("Printing level and height of node with value %d\n", valueToFind);
-    printLevelAndHeight(root, valueToFind, 0);
-
-    // Deallocate memory
-    freeBST(root);
+    // Printing the level and height of a node (Example: Node 25)
+    printLevelAndHeight(root, 25, 0);
 
     return 0;
 }

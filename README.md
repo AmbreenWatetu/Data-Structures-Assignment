@@ -1,9 +1,9 @@
 # Data-Structures-Assignment
 BST Assignment.
 Group Members
-AMBREEN EDITH WATETU - SCT-0611/2022
-ERICK MURU - SCT- 0972/2021
-ABRAHAM KUIR - SCT=0727/2020
+AMBREEN EDITH WATETU- SCT221-0611/2022
+ERICK MURU - SCT221- 0972/2021
+ABRAHAM KUIR - SCT221-0727/2020
  
  
 Consider a binary search tree (BST) represented by an array shown below
